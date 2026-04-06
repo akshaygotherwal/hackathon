@@ -30,12 +30,14 @@ export function simulateFuture(currentTwin, changes) {
   const delta = predictedResult.total - currentResult.total;
 
   return {
-    currentScore:   currentResult.total,
-    predictedScore: predictedResult.total,
+    currentScore:     currentResult.total,
+    predictedScore:   predictedResult.total,
     delta,
-    deltaLabel:     delta > 0 ? `+${delta}` : `${delta}`,
-    trend:          delta > 0 ? "improvement" : delta < 0 ? "decline" : "stable",
-    breakdown:      predictedResult.breakdown,
-    simulated,
+    deltaLabel:       delta > 0 ? `+${delta}` : `${delta}`,
+    trend:            delta > 0 ? "improvement" : delta < 0 ? "decline" : "stable",
+    breakdown:        predictedResult.breakdown,      // predicted per-metric %
+    currentBreakdown: currentResult.breakdown,        // current per-metric %
+    currentHabits:    current,                        // raw current twin values
+    simulated,                                        // raw scenario values
   };
 }
