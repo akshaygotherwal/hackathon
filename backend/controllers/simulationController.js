@@ -12,7 +12,10 @@ export async function simulate(req, res) {
     const recentHabits = await getRecentHabits(Number(userId), 7);
     const currentTwin  = buildDigitalTwin(recentHabits);
 
-    const result = simulateFuture(currentTwin, changes);
+    const { getProfile } = await import("../models/profileModel.js");
+    const profile = await getProfile(Number(userId));
+
+    const result = simulateFuture(currentTwin, changes, profile);
 
     return res.json(result);
   } catch (err) {

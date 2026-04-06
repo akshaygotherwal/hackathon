@@ -1,12 +1,13 @@
-import { calculateHealthScore } from "./healthScoreEngine.js";
-import { predictWeight }        from "./weightPrediction.js";
-import { getGoalRecommendations } from "./goalEngine.js";
+import { calculateHealthScore }   from "./healthScoreEngine.js";
+import { predictWeight }           from "./weightPrediction.js";
+import { getGoalRecommendations }  from "./goalEngine.js";
 
 /**
  * Prediction Engine
  * Simulates future health score & weight given scenario overrides on top of the current twin.
+ * Accepts an optional profile for BMI-based penalty.
  */
-export function simulateFuture(currentTwin, changes) {
+export function simulateFuture(currentTwin, changes, profile = null) {
   // Merge current twin averages with scenario overrides
   const simulated = {
     sleep_hours:      changes.sleep      ?? currentTwin.sleep_avg,
@@ -31,7 +32,7 @@ export function simulateFuture(currentTwin, changes) {
     protein_intake:   currentTwin.avg_protein  ?? null,
   };
 
-  // Compute goal targets if weight supplied
+  // Compute goal targets & weight prediction if weight supplied
   let weightPrediction = null;
   const cw = changes.current_weight ?? null;
   const gw = changes.goal_weight    ?? null;
@@ -44,8 +45,8 @@ export function simulateFuture(currentTwin, changes) {
     }
   }
 
-  const predictedResult = calculateHealthScore(simulated);
-  const currentResult   = calculateHealthScore(current);
+  const predictedResult = calculateHealthScore(simulated, profile);
+  const currentResult   = calculateHealthScore(current,   profile);
 
   const delta = predictedResult.total - currentResult.total;
 
@@ -59,6 +60,6 @@ export function simulateFuture(currentTwin, changes) {
     currentBreakdown: currentResult.breakdown,
     currentHabits:    current,
     simulated,
-    weightPrediction,                                 // null if no weight data
+    weightPrediction,
   };
-}
+}

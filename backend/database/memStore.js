@@ -9,6 +9,7 @@ let scoreIdSeq = 1;
 let foodIdSeq  = 1;
 
 export const store = {
+  profiles:     [],  // { user_id, height_cm, weight_kg, age, gender }
   habits:       [],  // { id, user_id, sleep_hours, water_intake, steps, meal_regularity, screen_time, exercise_minutes, created_at }
   healthScores: [],  // { id, user_id, habit_id, score, created_at }
   foodLogs:     [],  // { id, user_id, meal_type, food_name, quantity, calories, protein, created_at }
@@ -28,6 +29,21 @@ export const db = {
       store.healthScores.push(record);
       return record;
     }
+  },
+
+  async upsertProfile(userId, data) {
+    const idx = store.profiles.findIndex(p => p.user_id === userId);
+    const profile = { user_id: userId, ...data };
+    if (idx >= 0) {
+      store.profiles[idx] = profile;
+    } else {
+      store.profiles.push(profile);
+    }
+    return profile;
+  },
+
+  async selectProfile(userId) {
+    return store.profiles.find(p => p.user_id === userId) || null;
   },
 
   async select(table, userId, limit = 30) {

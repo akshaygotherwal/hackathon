@@ -32,4 +32,8 @@ export const getGoalRecommendations = (currentWeight, goalWeight) =>
 
 export const getWeightPrediction = (data) => api.post("/nutrition/predict-weight", data);
 
+// ── Profile ─────────────────────────────────────────────────
+export const fetchProfile = (userId) => api.get(`/profile/${userId}`);
+export const saveProfile  = (data)   => api.post("/profile", data);
+
 export default api;

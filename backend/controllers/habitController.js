@@ -39,7 +39,11 @@ export async function logHabit(req, res) {
       exercise_minutes,
     });
 
-    const { total: score, breakdown } = calculateHealthScore(habit);
+    // Bring in profile to refine the score
+    const { getProfile } = await import("../models/profileModel.js");
+    const profile = await getProfile(userId);
+
+    const { total: score, breakdown } = calculateHealthScore(habit, profile);
     await saveHealthScore(userId, habit.id, score);
 
     const insight = generateInsight(habit, score);

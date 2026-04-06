@@ -9,6 +9,7 @@ import FoodLogger         from "./FoodLogger";
 import NutritionDashboard from "./NutritionDashboard";
 import GoalTracker        from "./GoalTracker";
 import WeightPrediction   from "./WeightPrediction";
+import TwinProfile        from "./twinProfile";
 import { fetchTwin }      from "../services/api";
 
 const USER_ID = 1;
@@ -19,6 +20,7 @@ const TABS = [
   { id: "nutrition",  label: "Nutrition",  icon: "🍽️" },
   { id: "simulate",   label: "Simulate",   icon: "🔮" },
   { id: "analytics",  label: "Analytics",  icon: "📈" },
+  { id: "profile",    label: "Profile",    icon: "👤" },
 ];
 
 export default function Dashboard() {
@@ -27,8 +29,8 @@ export default function Dashboard() {
   const [latestScore,     setLatestScore]     = useState(null);
   const [latestBreakdown, setLatestBreakdown] = useState(null);
   const [latestInsight,   setLatestInsight]   = useState(null);
-  const [twinGoals,       setTwinGoals]       = useState(null);   // goals from twin endpoint
-  const [goalData,        setGoalData]        = useState(null);   // goals from GoalTracker
+  const [twinGoals,       setTwinGoals]       = useState(null);
+  const [goalData,        setGoalData]        = useState(null);
   const [refreshKey,      setRefreshKey]      = useState(0);
   const [foodRefreshKey,  setFoodRefreshKey]  = useState(0);
   const [activeTab,       setActiveTab]       = useState("overview");
@@ -58,7 +60,7 @@ export default function Dashboard() {
 
   const handleFoodLogged = () => {
     setFoodRefreshKey(k => k + 1);
-    setRefreshKey(k => k + 1);  // also refresh twin
+    setRefreshKey(k => k + 1);
   };
 
   const displayScore     = latestScore;
@@ -131,7 +133,7 @@ export default function Dashboard() {
         {activeTab === "overview" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
             <HealthScore     score={displayScore ?? twinScore} breakdown={displayBreakdown} />
-            <DigitalTwinCard twin={twin}   twinScore={twinScore} latestScore={displayScore} />
+            <DigitalTwinCard twin={twin} twinScore={twinScore} latestScore={displayScore} />
             <div className="lg:col-span-2">
               <AiInsightPanel insight={displayInsight} />
             </div>
@@ -159,12 +161,10 @@ export default function Dashboard() {
         {activeTab === "nutrition" && (
           <div className="animate-fade-in space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Left column */}
               <div className="space-y-6">
                 <FoodLogger userId={USER_ID} onLogged={handleFoodLogged} />
                 <GoalTracker onGoalSet={setGoalData} />
               </div>
-              {/* Right column */}
               <div className="space-y-6">
                 <NutritionDashboard userId={USER_ID} goals={activeGoals} refreshKey={foodRefreshKey} />
                 <WeightPrediction />
@@ -188,6 +188,13 @@ export default function Dashboard() {
               <DigitalTwinCard twin={twin} twinScore={twinScore} latestScore={displayScore} />
               <AiInsightPanel  insight={displayInsight} />
             </div>
+          </div>
+        )}
+
+        {/* Profile */}
+        {activeTab === "profile" && (
+          <div className="max-w-2xl mx-auto animate-fade-in">
+            <TwinProfile userId={USER_ID} onProfileSaved={() => setRefreshKey(k => k + 1)} />
           </div>
         )}
       </main>
