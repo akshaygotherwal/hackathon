@@ -1,12 +1,20 @@
-import { useState } from "react";
-import { getGoalRecommendations } from "../services/api";
+import { useState, useEffect } from "react";
+import { getGoalRecommendations, fetchProfile } from "../services/api";
 
-export default function GoalTracker({ onGoalSet }) {
+export default function GoalTracker({ onGoalSet, userId = 1 }) {
   const [currentWeight, setCurrentWeight] = useState("");
   const [goalWeight,    setGoalWeight]    = useState("");
   const [result,        setResult]        = useState(null);
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState(null);
+
+  useEffect(() => {
+    fetchProfile(userId).then(res => {
+      if (res.data?.profile?.weight_kg) {
+        setCurrentWeight(res.data.profile.weight_kg.toString());
+      }
+    }).catch(() => {});
+  }, [userId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -45,11 +53,11 @@ export default function GoalTracker({ onGoalSet }) {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="label">Current Weight (kg)</label>
-            <input type="number" min="30" max="300" step="0.1"
-              value={currentWeight}
-              onChange={e => setCurrentWeight(e.target.value)}
-              placeholder="e.g. 75"
-              className="w-full bg-slate-800/60 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-500/60" />
+            <div className="w-full bg-slate-800/30 border border-white/5 rounded-xl px-4 py-2.5 text-sm text-slate-300 flex justify-between items-center cursor-not-allowed">
+              <span>{currentWeight || "—"}</span>
+              <span className="text-[10px] text-slate-500 uppercase px-2 py-0.5 rounded-md bg-slate-800">From Profile</span>
+            </div>
+            {!currentWeight && <p className="text-[10px] text-amber-400 mt-1 ml-1">Please set your weight in the Profile tab.</p>}
           </div>
           <div>
             <label className="label">Goal Weight (kg)</label>
