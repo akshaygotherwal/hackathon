@@ -30,7 +30,10 @@ export async function getTwin(req, res) {
       exercise_minutes: twin.exercise_avg,
     };
 
-    const { total: score, breakdown } = calculateHealthScore(habitData);
+    const { getProfile } = await import("../models/profileModel.js");
+    const profile = await getProfile(Number(userId));
+
+    const { total: score, breakdown } = calculateHealthScore(habitData, profile);
     const insight = generateInsight(habitData, score);
 
     return res.json({ twin, score, breakdown, insight });

@@ -4,7 +4,7 @@ import { calculateHealthScore } from "./healthScoreEngine.js";
  * Prediction Engine
  * Simulates future health score given scenario overrides on top of the current twin.
  */
-export function simulateFuture(currentTwin, changes) {
+export function simulateFuture(currentTwin, changes, profile = null) {
   // Merge current twin averages with scenario overrides
   const simulated = {
     sleep_hours:      changes.sleep      ?? currentTwin.sleep_avg,
@@ -24,8 +24,8 @@ export function simulateFuture(currentTwin, changes) {
     exercise_minutes: currentTwin.exercise_avg ?? 0,
   };
 
-  const predictedResult = calculateHealthScore(simulated);
-  const currentResult   = calculateHealthScore(current);
+  const predictedResult = calculateHealthScore(simulated, profile);
+  const currentResult   = calculateHealthScore(current, profile);
 
   const delta = predictedResult.total - currentResult.total;
 

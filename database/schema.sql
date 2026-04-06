@@ -10,6 +10,16 @@ CREATE TABLE IF NOT EXISTS users (
   created_at TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
 );
 
+-- User Profiles (Biometrics)
+CREATE TABLE IF NOT EXISTS user_profiles (
+  user_id    INT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  height_cm  FLOAT,
+  weight_kg  FLOAT,
+  age        INT,
+  gender     TEXT,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Daily habit logs (one entry per day per user)
 CREATE TABLE IF NOT EXISTS habits (
   id               SERIAL PRIMARY KEY,

@@ -5,6 +5,7 @@ import HealthScore     from "./healthScore";
 import FutureSimulator from "./futureSimulator";
 import WeeklyAnalytics from "./weeklyAnalytics";
 import AiInsightPanel  from "./aiInsightPanel";
+import TwinProfile     from "./twinProfile";
 import { fetchTwin }   from "../services/api";
 
 const USER_ID = 1;
@@ -14,6 +15,7 @@ const TABS = [
   { id: "log",       label: "Log Habit", icon: "📝" },
   { id: "simulate",  label: "Simulate",  icon: "🔮" },
   { id: "analytics", label: "Analytics", icon: "📈" },
+  { id: "profile",   label: "Profile",   icon: "👤" },
 ];
 
 export default function Dashboard() {
@@ -164,6 +166,13 @@ export default function Dashboard() {
               <DigitalTwinCard twin={twin} twinScore={twinScore} latestScore={displayScore} />
               <AiInsightPanel  insight={displayInsight} />
             </div>
+          </div>
+        )}
+
+        {/* Profile */}
+        {activeTab === "profile" && (
+          <div className="max-w-2xl mx-auto animate-fade-in">
+            <TwinProfile userId={USER_ID} onProfileSaved={() => setRefreshKey(k => k + 1)} />
           </div>
         )}
       </main>

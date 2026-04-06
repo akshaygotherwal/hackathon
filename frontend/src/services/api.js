@@ -21,4 +21,8 @@ export const runSimulation = (data)  => api.post("/simulate", data);
 // ── Analytics ───────────────────────────────────────────────
 export const fetchAnalytics = (userId) => api.get(`/analytics/${userId}/weekly`);
 
+// ── Profile ─────────────────────────────────────────────────
+export const fetchProfile   = (userId) => api.get(`/profile/${userId}`);
+export const saveProfile    = (data)   => api.post("/profile", data);
+
 export default api;
