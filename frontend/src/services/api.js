@@ -21,4 +21,15 @@ export const runSimulation = (data)  => api.post("/simulate", data);
 // ── Analytics ───────────────────────────────────────────────
 export const fetchAnalytics = (userId) => api.get(`/analytics/${userId}/weekly`);
 
+// ── Food Tracker ────────────────────────────────────────────
+export const getFoodDatabase        = ()       => api.get("/food/db");
+export const addFood                = (data)   => api.post("/food/add", data);
+export const getFoodLogs            = (userId) => api.get(`/food/get/${userId}`);
+
+// ── Nutrition / Goal ────────────────────────────────────────
+export const getGoalRecommendations = (currentWeight, goalWeight) =>
+  api.post("/nutrition/goal", { current_weight: currentWeight, goal_weight: goalWeight });
+
+export const getWeightPrediction = (data) => api.post("/nutrition/predict-weight", data);
+
 export default api;

@@ -1,40 +1,44 @@
 import { useCallback, useEffect, useState } from "react";
-import HabitForm       from "./habitForm";
-import DigitalTwinCard from "./digitaltwincard";
-import HealthScore     from "./healthScore";
-import FutureSimulator from "./futureSimulator";
-import WeeklyAnalytics from "./weeklyAnalytics";
-import AiInsightPanel  from "./aiInsightPanel";
-import { fetchTwin }   from "../services/api";
+import HabitForm          from "./habitForm";
+import DigitalTwinCard    from "./digitaltwincard";
+import HealthScore        from "./healthScore";
+import FutureSimulator    from "./futureSimulator";
+import WeeklyAnalytics    from "./weeklyAnalytics";
+import AiInsightPanel     from "./aiInsightPanel";
+import FoodLogger         from "./FoodLogger";
+import NutritionDashboard from "./NutritionDashboard";
+import GoalTracker        from "./GoalTracker";
+import WeightPrediction   from "./WeightPrediction";
+import { fetchTwin }      from "../services/api";
 
 const USER_ID = 1;
 
 const TABS = [
-  { id: "overview",  label: "Overview",  icon: "🏠" },
-  { id: "log",       label: "Log Habit", icon: "📝" },
-  { id: "simulate",  label: "Simulate",  icon: "🔮" },
-  { id: "analytics", label: "Analytics", icon: "📈" },
+  { id: "overview",   label: "Overview",   icon: "🏠" },
+  { id: "log",        label: "Log Habit",  icon: "📝" },
+  { id: "nutrition",  label: "Nutrition",  icon: "🍽️" },
+  { id: "simulate",   label: "Simulate",   icon: "🔮" },
+  { id: "analytics",  label: "Analytics",  icon: "📈" },
 ];
 
 export default function Dashboard() {
-  const [twin,       setTwin]       = useState(null);
-  const [twinScore,  setTwinScore]  = useState(null);   // 7-day average score
+  const [twin,            setTwin]            = useState(null);
+  const [twinScore,       setTwinScore]       = useState(null);
+  const [latestScore,     setLatestScore]     = useState(null);
+  const [latestBreakdown, setLatestBreakdown] = useState(null);
+  const [latestInsight,   setLatestInsight]   = useState(null);
+  const [twinGoals,       setTwinGoals]       = useState(null);   // goals from twin endpoint
+  const [goalData,        setGoalData]        = useState(null);   // goals from GoalTracker
+  const [refreshKey,      setRefreshKey]      = useState(0);
+  const [foodRefreshKey,  setFoodRefreshKey]  = useState(0);
+  const [activeTab,       setActiveTab]       = useState("overview");
 
-  // Latest habit-log score — overrides twin score in the ring when fresh
-  const [latestScore,    setLatestScore]    = useState(null);
-  const [latestBreakdown,setLatestBreakdown]= useState(null);
-  const [latestInsight,  setLatestInsight]  = useState(null);
-
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [activeTab,  setActiveTab]  = useState("overview");
-
-  // loadTwin only updates twin + twinScore — never clobbers the fresh score
   const loadTwin = useCallback(async () => {
     try {
       const { data } = await fetchTwin(USER_ID);
       setTwin(data.twin);
       setTwinScore(data.score);
-      // Only populate latest* from twin if we have nothing yet (first load)
+      if (data.goals) setTwinGoals(data.goals);
       if (data.score !== null) {
         setLatestScore(     prev => prev !== null ? prev : data.score);
         setLatestBreakdown( prev => prev !== null ? prev : data.breakdown);
@@ -45,20 +49,22 @@ export default function Dashboard() {
 
   useEffect(() => { loadTwin(); }, [loadTwin, refreshKey]);
 
-  // Called after a successful POST /api/habits
   const handleHabitLogged = (data) => {
-    // Immediately show the score of the entry just logged
     setLatestScore(data.score);
     setLatestBreakdown(data.breakdown);
     setLatestInsight(data.insight);
-    // Refresh twin in background (updates twin averages + twinScore)
     setRefreshKey(k => k + 1);
   };
 
-  // What we display: prefer the freshly-logged score over the twin average
-  const displayScore    = latestScore;
-  const displayBreakdown= latestBreakdown;
-  const displayInsight  = latestInsight;
+  const handleFoodLogged = () => {
+    setFoodRefreshKey(k => k + 1);
+    setRefreshKey(k => k + 1);  // also refresh twin
+  };
+
+  const displayScore     = latestScore;
+  const displayBreakdown = latestBreakdown;
+  const displayInsight   = latestInsight;
+  const activeGoals      = goalData ?? twinGoals;
 
   return (
     <div className="min-h-screen">
@@ -93,7 +99,7 @@ export default function Dashboard() {
             ))}
           </div>
 
-          {/* Live score pill — shows latest score, falls back to twin score */}
+          {/* Live score pill */}
           {(displayScore !== null || twinScore !== null) && (
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold"
               style={{ background: "rgba(37,99,235,0.2)", border: "1px solid rgba(96,165,250,0.3)", color: "#93c5fd" }}>
@@ -106,7 +112,7 @@ export default function Dashboard() {
       {/* ── Main Content ──────────────────────────────────── */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
-        {/* Hero banner — only when no data at all */}
+        {/* Hero banner — only when no data */}
         {activeTab === "overview" && displayScore === null && twinScore === null && (
           <div className="card p-8 mb-8 text-center animate-fade-in"
             style={{ background: "linear-gradient(135deg, rgba(30,41,59,0.8), rgba(15,23,42,0.9))" }}>
@@ -146,6 +152,24 @@ export default function Dashboard() {
                 <AiInsightPanel insight={displayInsight} />
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Nutrition Tab ─────────────────────────────────── */}
+        {activeTab === "nutrition" && (
+          <div className="animate-fade-in space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Left column */}
+              <div className="space-y-6">
+                <FoodLogger userId={USER_ID} onLogged={handleFoodLogged} />
+                <GoalTracker onGoalSet={setGoalData} />
+              </div>
+              {/* Right column */}
+              <div className="space-y-6">
+                <NutritionDashboard userId={USER_ID} goals={activeGoals} refreshKey={foodRefreshKey} />
+                <WeightPrediction />
+              </div>
+            </div>
           </div>
         )}
 

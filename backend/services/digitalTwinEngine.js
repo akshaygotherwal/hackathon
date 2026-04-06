@@ -1,8 +1,9 @@
 /**
  * Digital Twin Engine
  * Builds an averaged profile from a user's recent habit entries.
+ * Optionally merges nutrition data (avg daily calories & protein).
  */
-export function buildDigitalTwin(habits) {
+export function buildDigitalTwin(habits, nutritionData = null) {
   if (!habits || habits.length === 0) {
     return {
       sleep_avg:        0,
@@ -37,5 +38,8 @@ export function buildDigitalTwin(habits) {
     screen_avg:       Math.round((sum.screen   / n) * 10) / 10,
     exercise_avg:     Math.round(sum.exercise  / n),
     entries_analysed: n,
+    // Nutrition (injected from nutritionEngine if provided)
+    avg_calories:     nutritionData ? Math.round(nutritionData.calories) : null,
+    avg_protein:      nutritionData ? Math.round(nutritionData.protein * 10) / 10 : null,
   };
 }

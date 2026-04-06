@@ -1,8 +1,10 @@
 import { calculateHealthScore } from "./healthScoreEngine.js";
+import { predictWeight }        from "./weightPrediction.js";
+import { getGoalRecommendations } from "./goalEngine.js";
 
 /**
  * Prediction Engine
- * Simulates future health score given scenario overrides on top of the current twin.
+ * Simulates future health score & weight given scenario overrides on top of the current twin.
  */
 export function simulateFuture(currentTwin, changes) {
   // Merge current twin averages with scenario overrides
@@ -13,6 +15,9 @@ export function simulateFuture(currentTwin, changes) {
     meal_regularity:  changes.meals      ?? currentTwin.meal_avg ?? 3,
     screen_time:      changes.screen     ?? currentTwin.screen_avg ?? 4,
     exercise_minutes: changes.exercise   ?? currentTwin.exercise_avg ?? 0,
+    // Nutrition overrides (optional — from food tracker simulation)
+    calories_intake:  changes.calories   ?? null,
+    protein_intake:   changes.protein    ?? null,
   };
 
   const current = {
@@ -22,7 +27,22 @@ export function simulateFuture(currentTwin, changes) {
     meal_regularity:  currentTwin.meal_avg   ?? 3,
     screen_time:      currentTwin.screen_avg  ?? 4,
     exercise_minutes: currentTwin.exercise_avg ?? 0,
+    calories_intake:  currentTwin.avg_calories ?? null,
+    protein_intake:   currentTwin.avg_protein  ?? null,
   };
+
+  // Compute goal targets if weight supplied
+  let weightPrediction = null;
+  const cw = changes.current_weight ?? null;
+  const gw = changes.goal_weight    ?? null;
+  if (cw && simulated.calories_intake !== null) {
+    const goals = getGoalRecommendations(cw, gw ?? cw);
+    if (goals) {
+      simulated.required_calories = goals.required_calories;
+      simulated.required_protein  = goals.required_protein;
+      weightPrediction = predictWeight(cw, simulated.calories_intake, goals.required_calories);
+    }
+  }
 
   const predictedResult = calculateHealthScore(simulated);
   const currentResult   = calculateHealthScore(current);
@@ -35,9 +55,10 @@ export function simulateFuture(currentTwin, changes) {
     delta,
     deltaLabel:       delta > 0 ? `+${delta}` : `${delta}`,
     trend:            delta > 0 ? "improvement" : delta < 0 ? "decline" : "stable",
-    breakdown:        predictedResult.breakdown,      // predicted per-metric %
-    currentBreakdown: currentResult.breakdown,        // current per-metric %
-    currentHabits:    current,                        // raw current twin values
-    simulated,                                        // raw scenario values
+    breakdown:        predictedResult.breakdown,
+    currentBreakdown: currentResult.breakdown,
+    currentHabits:    current,
+    simulated,
+    weightPrediction,                                 // null if no weight data
   };
-}
+}

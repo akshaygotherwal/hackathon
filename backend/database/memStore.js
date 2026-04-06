@@ -6,10 +6,12 @@
 
 let habitIdSeq = 1;
 let scoreIdSeq = 1;
+let foodIdSeq  = 1;
 
 export const store = {
   habits:       [],  // { id, user_id, sleep_hours, water_intake, steps, meal_regularity, screen_time, exercise_minutes, created_at }
   healthScores: [],  // { id, user_id, habit_id, score, created_at }
+  foodLogs:     [],  // { id, user_id, meal_type, food_name, quantity, calories, protein, created_at }
 };
 
 // Simulate async DB behaviour
@@ -84,5 +86,30 @@ export const db = {
           avg_health_score:  avgScore,
         };
       });
+  },
+
+  // ── Food Logs ──────────────────────────────────────────────
+  async insertFood(row) {
+    const now    = new Date().toISOString();
+    const record = { ...row, id: foodIdSeq++, created_at: now };
+    store.foodLogs.push(record);
+    return record;
+  },
+
+  async selectFood(userId, limit = 30) {
+    return store.foodLogs
+      .filter((f) => f.user_id === userId)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, limit);
+  },
+
+  async selectFoodToday(userId) {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    return store.foodLogs
+      .filter(
+        (f) => f.user_id === userId && new Date(f.created_at) >= startOfDay
+      )
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   },
 };
