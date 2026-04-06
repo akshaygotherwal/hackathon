@@ -26,10 +26,16 @@ export async function getTwin(req, res) {
     const mealStats = await getMealStats(uid);
     const twin      = buildDigitalTwin(recentHabits, nutrition.entries > 0 ? nutrition : null, mealStats);
 
+    const { getProfile } = await import("../models/profileModel.js");
+    const profile = await getProfile(uid);
+
     // Default goal recommendations (70 kg maintenance if no weight stored yet)
+    // Pull weight from profile if available
+    const baseWeight = profile?.weight_kg ?? twin.current_weight ?? 70;
     const goals = getGoalRecommendations(
-      twin.current_weight ?? 70,
-      twin.goal_weight    ?? 70
+      baseWeight,
+      twin.goal_weight ?? baseWeight,
+      profile
     );
 
     // Score the twin using its averages (+ nutrition if available)
@@ -45,9 +51,6 @@ export async function getTwin(req, res) {
       required_calories: goals?.required_calories ?? null,
       required_protein:  goals?.required_protein  ?? null,
     };
-
-    const { getProfile } = await import("../models/profileModel.js");
-    const profile = await getProfile(Number(userId));
 
     const { total: score, breakdown } = calculateHealthScore(habitData, profile);
     const insight = generateInsight(habitData, score);

@@ -10,15 +10,30 @@
  *     goal = current  → maintain (TDEE = weight × 33)
  */
 
-const BASE_CALORIE_MULTIPLIER = 33; // rough TDEE approximation per kg
+const BASE_CALORIE_MULTIPLIER = 33; // rough TDEE approximation per kg (fallback)
 
-export function getGoalRecommendations(currentWeight, goalWeight) {
+export function getGoalRecommendations(currentWeight, goalWeight, profile = null) {
   const cw = Number(currentWeight);
   const gw = Number(goalWeight);
 
   if (!cw || cw <= 0) return null;
 
-  const maintenanceCalories = Math.round(cw * BASE_CALORIE_MULTIPLIER);
+  let maintenanceCalories;
+
+  if (profile && profile.height_cm && profile.age) {
+    // Basic Mifflin-St Jeor BMR
+    let bmr = (10 * cw) + (6.25 * profile.height_cm) - (5 * profile.age);
+    if (profile.gender === "Female") {
+      bmr -= 161;
+    } else {
+      bmr += 5; // Default/Male
+    }
+    // Multiply by 1.375 (Light Activity factor) as a baseline digital twin default
+    maintenanceCalories = Math.round(bmr * 1.375);
+  } else {
+    maintenanceCalories = Math.round(cw * BASE_CALORIE_MULTIPLIER);
+  }
+
   const proteinRequired     = Math.round(cw * 1.8 * 10) / 10;
 
   let mode, adjustment, requiredCalories;

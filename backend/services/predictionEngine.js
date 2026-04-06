@@ -34,10 +34,10 @@ export function simulateFuture(currentTwin, changes, profile = null) {
 
   // Compute goal targets & weight prediction if weight supplied
   let weightPrediction = null;
-  const cw = changes.current_weight ?? null;
+  const cw = changes.current_weight ?? profile?.weight_kg ?? currentTwin.current_weight ?? null;
   const gw = changes.goal_weight    ?? null;
   if (cw && simulated.calories_intake !== null) {
-    const goals = getGoalRecommendations(cw, gw ?? cw);
+    const goals = getGoalRecommendations(cw, gw ?? cw, profile);
     if (goals) {
       simulated.required_calories = goals.required_calories;
       simulated.required_protein  = goals.required_protein;
