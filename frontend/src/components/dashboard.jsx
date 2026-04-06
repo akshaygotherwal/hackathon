@@ -12,6 +12,43 @@ import WeightPrediction   from "./WeightPrediction";
 import TwinProfile        from "./twinProfile";
 import { fetchTwin }      from "../services/api";
 
+function MealSummaryCard({ mealStats }) {
+  if (!mealStats) return null;
+  const { totalMeals, mealBreakdown } = mealStats;
+  let consistency = "Good";
+  let color = "text-green-400";
+  if (totalMeals < 2) { consistency = "Poor"; color = "text-red-400"; }
+  else if (totalMeals === 2) { consistency = "Moderate"; color = "text-yellow-400"; }
+
+  return (
+    <div className="card p-6 border-t-4 border-blue-500">
+      <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+        <span>🍽️</span> Today's Meals
+      </h3>
+      
+      <div className="flex justify-between items-end mb-4">
+        <div>
+          <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Consistency</p>
+          <p className={`text-xl font-bold ${color}`}>{consistency}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Total</p>
+          <p className="text-2xl font-bold text-white">{totalMeals} <span className="text-sm font-normal text-slate-500">/ 4</span></p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2 text-sm">
+        {["breakfast", "lunch", "snacks", "dinner"].map(meal => (
+          <div key={meal} className="flex justify-between items-center bg-slate-800/50 p-2 rounded-lg">
+            <span className="capitalize text-slate-300">{meal}</span>
+            <span>{mealBreakdown[meal] ? "✅" : "❌"}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 const USER_ID = 1;
 
 const TABS = [
@@ -30,6 +67,7 @@ export default function Dashboard() {
   const [latestBreakdown, setLatestBreakdown] = useState(null);
   const [latestInsight,   setLatestInsight]   = useState(null);
   const [twinGoals,       setTwinGoals]       = useState(null);
+  const [twinMeals,       setTwinMeals]       = useState(null);
   const [goalData,        setGoalData]        = useState(null);
   const [refreshKey,      setRefreshKey]      = useState(0);
   const [foodRefreshKey,  setFoodRefreshKey]  = useState(0);
@@ -41,6 +79,7 @@ export default function Dashboard() {
       setTwin(data.twin);
       setTwinScore(data.score);
       if (data.goals) setTwinGoals(data.goals);
+      if (data.mealStats) setTwinMeals(data.mealStats);
       if (data.score !== null) {
         setLatestScore(     prev => prev !== null ? prev : data.score);
         setLatestBreakdown( prev => prev !== null ? prev : data.breakdown);
@@ -134,6 +173,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
             <HealthScore     score={displayScore ?? twinScore} breakdown={displayBreakdown} />
             <DigitalTwinCard twin={twin} twinScore={twinScore} latestScore={displayScore} />
+            <MealSummaryCard mealStats={twinMeals} />
             <div className="lg:col-span-2">
               <AiInsightPanel insight={displayInsight} />
             </div>

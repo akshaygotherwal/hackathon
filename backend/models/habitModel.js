@@ -6,7 +6,6 @@ export async function createHabit(userId, data) {
     sleep_hours,
     water_intake,
     steps,
-    meal_regularity,
     screen_time      = 0,
     exercise_minutes = 0,
   } = data;
@@ -16,7 +15,6 @@ export async function createHabit(userId, data) {
     sleep_hours:      Number(sleep_hours),
     water_intake:     Number(water_intake),
     steps:            Number(steps),
-    meal_regularity:  Number(meal_regularity),
     screen_time:      Number(screen_time),
     exercise_minutes: Number(exercise_minutes),
   });

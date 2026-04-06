@@ -32,4 +32,17 @@ router.post("/predict-weight", (req, res) => {
   }
 });
 
+// GET /api/nutrition/meal-stats/:userId
+router.get("/meal-stats/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    let { date } = req.query; // optional
+    const { getMealStats } = await import("../services/nutritionEngine.js");
+    const stats = await getMealStats(userId, date);
+    return res.json(stats);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch meal stats", detail: err.message });
+  }
+});
+
 export default router;

@@ -7,7 +7,7 @@
  *   future_weight           = current_weight + (weight_change_per_day × days)
  */
 
-export function predictWeight(currentWeight, calorieIntake, requiredCalories) {
+export function predictWeight(currentWeight, calorieIntake, requiredCalories, mealPattern = "regular") {
   const cw         = Number(currentWeight)   || 70;
   const intake     = Number(calorieIntake)   || 0;
   const required   = Number(requiredCalories) || 2000;
@@ -17,6 +17,10 @@ export function predictWeight(currentWeight, calorieIntake, requiredCalories) {
 
   const predicted7d  = Math.round((cw + weightChangePerDay * 7)  * 100) / 100;
   const predicted30d = Math.round((cw + weightChangePerDay * 30) * 100) / 100;
+
+  let confidence = "medium";
+  if (mealPattern === "irregular" && intake > required) confidence = "low";
+  else if (mealPattern === "balanced" || mealPattern === "regular") confidence = "high";
 
   return {
     current_weight:        cw,
@@ -29,5 +33,6 @@ export function predictWeight(currentWeight, calorieIntake, requiredCalories) {
     trend:
       calorieDiff > 50  ? "gaining" :
       calorieDiff < -50 ? "losing"  : "stable",
+    confidence,
   };
 }

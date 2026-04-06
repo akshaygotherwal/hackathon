@@ -9,7 +9,8 @@ export function calculateHealthScore(data, profile = null) {
     sleep_hours      = 0,
     water_intake     = 0,
     steps            = 0,
-    meal_regularity  = 0,
+    meal_regularity,
+    total_meals,
     screen_time      = 0,
     exercise_minutes = 0,
     // Optional nutrition fields (from food tracker)
@@ -19,11 +20,13 @@ export function calculateHealthScore(data, profile = null) {
     required_protein  = null,
   } = data;
 
+  const mealsCount = total_meals ?? meal_regularity ?? 0;
+
   // Individual sub-scores (0-100)
   const sleepScore      = sleep_hours >= 8 ? 100 : Math.min((sleep_hours / 8) * 100, 100);
   const hydrationScore  = water_intake >= 3 ? 100 : Math.min((water_intake / 3) * 100, 100);
   const activityScore   = steps >= 10000   ? 100 : Math.min((steps / 10000) * 100, 100);
-  const mealScore       = Math.min((meal_regularity / 4) * 100, 100);
+  const mealScore       = Math.min((mealsCount / 4) * 100, 100);
   const exerciseScore   = exercise_minutes >= 30 ? 100 : Math.min((exercise_minutes / 30) * 100, 100);
 
   // Nutrition score — only active when food data is supplied

@@ -13,7 +13,7 @@ export function simulateFuture(currentTwin, changes, profile = null) {
     sleep_hours:      changes.sleep      ?? currentTwin.sleep_avg,
     water_intake:     changes.water      ?? currentTwin.water_avg,
     steps:            changes.steps      ?? currentTwin.steps_avg,
-    meal_regularity:  changes.meals      ?? currentTwin.meal_avg ?? 3,
+    total_meals:      changes.meals      ?? currentTwin.avg_meals_per_day ?? 2,
     screen_time:      changes.screen     ?? currentTwin.screen_avg ?? 4,
     exercise_minutes: changes.exercise   ?? currentTwin.exercise_avg ?? 0,
     // Nutrition overrides (optional — from food tracker simulation)
@@ -25,7 +25,7 @@ export function simulateFuture(currentTwin, changes, profile = null) {
     sleep_hours:      currentTwin.sleep_avg,
     water_intake:     currentTwin.water_avg,
     steps:            currentTwin.steps_avg,
-    meal_regularity:  currentTwin.meal_avg   ?? 3,
+    total_meals:      currentTwin.avg_meals_per_day   ?? 2,
     screen_time:      currentTwin.screen_avg  ?? 4,
     exercise_minutes: currentTwin.exercise_avg ?? 0,
     calories_intake:  currentTwin.avg_calories ?? null,
@@ -41,12 +41,18 @@ export function simulateFuture(currentTwin, changes, profile = null) {
     if (goals) {
       simulated.required_calories = goals.required_calories;
       simulated.required_protein  = goals.required_protein;
-      weightPrediction = predictWeight(cw, simulated.calories_intake, goals.required_calories);
+      const mealPattern = simulated.total_meals >= 3 ? "balanced" : "irregular";
+      weightPrediction = predictWeight(cw, simulated.calories_intake, goals.required_calories, mealPattern);
     }
   }
 
   const predictedResult = calculateHealthScore(simulated, profile);
   const currentResult   = calculateHealthScore(current,   profile);
+
+  // Energy prediction modifier based on meal behavior
+  if (simulated.total_meals < 2) {
+    predictedResult.total = Math.max(0, predictedResult.total - 3);
+  }
 
   const delta = predictedResult.total - currentResult.total;
 

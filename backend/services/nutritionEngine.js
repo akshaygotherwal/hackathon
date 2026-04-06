@@ -21,3 +21,32 @@ export async function getDailyNutrition(userId) {
   const protein  = Math.round(logs.reduce((s, l) => s + (l.protein  || 0), 0) * 10) / 10;
   return { calories, protein, entries: logs.length };
 }
+
+export async function getMealStats(userId, dateStr = null) {
+  let logs;
+  if (dateStr) {
+    logs = await db.selectFoodByDate(Number(userId), dateStr);
+  } else {
+    logs = await db.selectFoodToday(Number(userId));
+  }
+  
+  const mealBreakdown = {
+    breakfast: false,
+    lunch: false,
+    snacks: false,
+    dinner: false,
+  };
+
+  logs.forEach((log) => {
+    if (log.meal_type && mealBreakdown[log.meal_type] !== undefined) {
+      mealBreakdown[log.meal_type] = true;
+    }
+  });
+
+  const totalMeals = Object.values(mealBreakdown).filter(Boolean).length;
+
+  return {
+    totalMeals,
+    mealBreakdown,
+  };
+}

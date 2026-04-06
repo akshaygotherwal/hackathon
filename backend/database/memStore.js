@@ -96,7 +96,6 @@ export const db = {
           avg_sleep:         avg("sleep_hours"),
           avg_water:         avg("water_intake"),
           avg_steps:         avg("steps"),
-          avg_meal_regularity: avg("meal_regularity"),
           avg_screen_time:   avg("screen_time"),
           avg_exercise:      avg("exercise_minutes"),
           avg_health_score:  avgScore,
@@ -126,6 +125,17 @@ export const db = {
       .filter(
         (f) => f.user_id === userId && new Date(f.created_at) >= startOfDay
       )
+      .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  },
+
+  async selectFoodByDate(userId, dateStr) {
+    // dateStr in YYYY-MM-DD
+    return store.foodLogs
+      .filter((f) => {
+        if (f.user_id !== userId) return false;
+        // created_at is an ISO string like 2026-04-06T12:00:00.000Z
+        return f.created_at.startsWith(dateStr);
+      })
       .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
   },
 };

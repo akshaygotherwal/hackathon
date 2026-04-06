@@ -48,7 +48,7 @@ export function generateInsight(data, score) {
   tips.push(TIPS.sleep[tier(data.sleep_hours || 0, 6, 7.5)]);
   tips.push(TIPS.hydration[tier(data.water_intake || 0, 1.5, 2.5)]);
   tips.push(TIPS.activity[tier(data.steps || 0, 4000, 8000)]);
-  tips.push(TIPS.meals[tier(data.meal_regularity || 0, 2, 3)]);
+  tips.push(TIPS.meals[tier(data.total_meals ?? data.meal_regularity ?? 0, 2, 3)]);
   tips.push(TIPS.exercise[tier(data.exercise_minutes || 0, 10, 25)]);
   tips.push(TIPS.screen[tier(10 - (data.screen_time || 0), 4, 7)]); // invert: less screen = better
 

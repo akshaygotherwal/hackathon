@@ -15,7 +15,6 @@ export async function logHabit(req, res) {
       sleep_hours,
       water_intake,
       steps,
-      meal_regularity,
       screen_time     = 0,
       exercise_minutes = 0,
     } = req.body;
@@ -24,8 +23,7 @@ export async function logHabit(req, res) {
     if (
       sleep_hours     === undefined ||
       water_intake    === undefined ||
-      steps           === undefined ||
-      meal_regularity === undefined
+      steps           === undefined
     ) {
       return res.status(400).json({ error: "Missing required habit fields" });
     }
@@ -34,7 +32,6 @@ export async function logHabit(req, res) {
       sleep_hours,
       water_intake,
       steps,
-      meal_regularity,
       screen_time,
       exercise_minutes,
     });
@@ -43,7 +40,8 @@ export async function logHabit(req, res) {
     const { getProfile } = await import("../models/profileModel.js");
     const profile = await getProfile(userId);
 
-    const { total: score, breakdown } = calculateHealthScore(habit, profile);
+    const scoreData = { ...habit, total_meals: 0 };
+    const { total: score, breakdown } = calculateHealthScore(scoreData, profile);
     await saveHealthScore(userId, habit.id, score);
 
     const insight = generateInsight(habit, score);

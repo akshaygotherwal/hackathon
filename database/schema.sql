@@ -27,7 +27,9 @@ CREATE TABLE IF NOT EXISTS habits (
   sleep_hours      FLOAT       NOT NULL CHECK (sleep_hours >= 0 AND sleep_hours <= 24),
   water_intake     FLOAT       NOT NULL CHECK (water_intake >= 0),
   steps            INT         NOT NULL CHECK (steps >= 0),
-  meal_regularity  INT         NOT NULL CHECK (meal_regularity BETWEEN 0 AND 4),
+  -- meal_regularity is deprecated. Derive meals from food logs instead.
+  -- ALTER TABLE habits DROP COLUMN meal_regularity;
+  meal_regularity  INT         NOT NULL DEFAULT 0,
   screen_time      FLOAT       NOT NULL DEFAULT 0 CHECK (screen_time >= 0),
   exercise_minutes INT         NOT NULL DEFAULT 0 CHECK (exercise_minutes >= 0),
   created_at       TIMESTAMP   DEFAULT CURRENT_TIMESTAMP
@@ -55,7 +57,6 @@ SELECT
   ROUND(AVG(h.sleep_hours)::NUMERIC, 2)     AS avg_sleep,
   ROUND(AVG(h.water_intake)::NUMERIC, 2)    AS avg_water,
   ROUND(AVG(h.steps)::NUMERIC, 0)           AS avg_steps,
-  ROUND(AVG(h.meal_regularity)::NUMERIC, 2) AS avg_meal_regularity,
   ROUND(AVG(h.screen_time)::NUMERIC, 2)     AS avg_screen_time,
   ROUND(AVG(h.exercise_minutes)::NUMERIC, 0)AS avg_exercise,
   ROUND(AVG(hs.score)::NUMERIC, 0)          AS avg_health_score

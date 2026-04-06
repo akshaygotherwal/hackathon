@@ -104,32 +104,6 @@ function StepsSelector({ value, onChange }) {
   );
 }
 
-function MealsSelector({ value, onChange }) {
-  const options = [
-    { val: 0, label: "None",    desc: "Skipping" },
-    { val: 1, label: "1 meal",  desc: "One meal" },
-    { val: 2, label: "2 meals", desc: "Light" },
-    { val: 3, label: "3 meals", desc: "Ideal" },
-    { val: 4, label: "4+ meals",desc: "Active" },
-  ];
-  return (
-    <div>
-      <p className="label mb-3">🍽️ Meals Per Day</p>
-      <div className="flex gap-2">
-        {options.map(({ val, label, desc }) => (
-          <button
-            key={val}
-            onClick={() => onChange(val)}
-            className={`pill flex-col gap-0.5 py-3 ${value === val ? "active" : ""}`}
-          >
-            <span className="text-base font-bold">{val}</span>
-            <span className="text-[10px] font-medium opacity-70">{desc}</span>
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function ScreenTimeSelector({ value, onChange }) {
   const presets = [
@@ -211,7 +185,7 @@ function ExerciseSelector({ value, onChange }) {
 /* ─── Main Form ────────────────────────────────────────────── */
 const DEFAULTS = {
   sleep_hours: 7, water_intake: 2, steps: 7500,
-  meal_regularity: 3, screen_time: 4, exercise_minutes: 30,
+  screen_time: 4, exercise_minutes: 30,
 };
 
 export default function HabitForm({ onSuccess }) {
@@ -251,7 +225,6 @@ export default function HabitForm({ onSuccess }) {
       <SleepSelector    value={data.sleep_hours}      onChange={v => set("sleep_hours", v)} />
       <WaterSelector    value={data.water_intake}     onChange={v => set("water_intake", v)} />
       <StepsSelector    value={data.steps}            onChange={v => set("steps", v)} />
-      <MealsSelector    value={data.meal_regularity}  onChange={v => set("meal_regularity", v)} />
       <ScreenTimeSelector value={data.screen_time}    onChange={v => set("screen_time", v)} />
       <ExerciseSelector value={data.exercise_minutes} onChange={v => set("exercise_minutes", v)} />
 
@@ -261,7 +234,6 @@ export default function HabitForm({ onSuccess }) {
           { icon: "🌙", label: "Sleep",    val: `${data.sleep_hours}h` },
           { icon: "💧", label: "Water",    val: `${data.water_intake}L` },
           { icon: "🚶", label: "Steps",    val: data.steps >= 1000 ? `${(data.steps/1000).toFixed(1)}K` : data.steps },
-          { icon: "🍽️", label: "Meals",    val: data.meal_regularity },
           { icon: "📱", label: "Screen",   val: `${data.screen_time}h` },
           { icon: "🏋️", label: "Exercise", val: `${data.exercise_minutes}m` },
         ].map(({ icon, label, val }) => (

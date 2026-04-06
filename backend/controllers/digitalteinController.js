@@ -2,7 +2,7 @@ import { getRecentHabits } from "../models/habitModel.js";
 import { buildDigitalTwin   } from "../services/digitalTwinEngine.js";
 import { calculateHealthScore} from "../services/healthScoreEngine.js";
 import { generateInsight     } from "../services/aiInsight.js";
-import { getDailyNutrition  } from "../services/nutritionEngine.js";
+import { getDailyNutrition, getMealStats } from "../services/nutritionEngine.js";
 import { getGoalRecommendations } from "../services/goalEngine.js";
 
 // GET /api/twin/:userId
@@ -21,9 +21,10 @@ export async function getTwin(req, res) {
       });
     }
 
-    // Pull today's nutrition
+    // Pull today's nutrition and meals
     const nutrition = await getDailyNutrition(uid);
-    const twin      = buildDigitalTwin(recentHabits, nutrition.entries > 0 ? nutrition : null);
+    const mealStats = await getMealStats(uid);
+    const twin      = buildDigitalTwin(recentHabits, nutrition.entries > 0 ? nutrition : null, mealStats);
 
     // Default goal recommendations (70 kg maintenance if no weight stored yet)
     const goals = getGoalRecommendations(
@@ -36,7 +37,7 @@ export async function getTwin(req, res) {
       sleep_hours:      twin.sleep_avg,
       water_intake:     twin.water_avg,
       steps:            twin.steps_avg,
-      meal_regularity:  twin.meal_avg,
+      total_meals:      twin.avg_meals_per_day,
       screen_time:      twin.screen_avg,
       exercise_minutes: twin.exercise_avg,
       calories_intake:  nutrition.entries > 0 ? nutrition.calories  : null,
@@ -51,7 +52,7 @@ export async function getTwin(req, res) {
     const { total: score, breakdown } = calculateHealthScore(habitData, profile);
     const insight = generateInsight(habitData, score);
 
-    return res.json({ twin, score, breakdown, insight, nutrition, goals });
+    return res.json({ twin, score, breakdown, insight, nutrition, goals, mealStats });
   } catch (err) {
     console.error("getTwin error:", err);
     return res.status(500).json({ error: "Failed to build digital twin", detail: err.message });
