@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-surface-900 text-slate-100 font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 90% 60% at 50% -10%, rgba(37,99,235,0.22) 0%, transparent 65%),
+      radial-gradient(ellipse 55% 45% at 85% 85%, rgba(99,102,241,0.10) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 40% at 10% 70%, rgba(16,185,129,0.06) 0%, transparent 65%);
+    min-height: 100vh;
+  }
+
+  ::-webkit-scrollbar       { width: 5px; }
+  ::-webkit-scrollbar-track  { background: #0f172a; }
+  ::-webkit-scrollbar-thumb  { background: #475569; border-radius: 99px; }
+}
+
+@layer components {
+
+  /* ── Cards ─────────────────────────────────────────────── */
+  .card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 1.25rem;
+    box-shadow:
+      0 4px 6px -1px rgba(0,0,0,0.3),
+      0 20px 40px -12px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+
+  .card-inner {
+    background: rgba(30,41,59,0.50);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 0.875rem;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl
+           font-semibold text-sm text-white
+           transition-all duration-200
+           disabled:opacity-40 disabled:cursor-not-allowed;
+    background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+    box-shadow: 0 4px 20px rgba(37,99,235,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(37,99,235,0.55), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-4 py-2 rounded-xl font-medium text-sm
+           text-slate-400 hover:text-white transition-all duration-200;
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); }
+  .btn-ghost.active {
+    @apply text-white;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+
+  /* ── Pill selector ──────────────────────────────────────── */
+  .pill {
+    @apply flex-1 flex items-center justify-center py-2.5 rounded-xl text-sm font-semibold
+           cursor-pointer select-none transition-all duration-150 text-slate-400;
+    background: rgba(51,65,85,0.40);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .pill:hover  { @apply text-white; background: rgba(51,65,85,0.70); }
+  .pill.active {
+    @apply text-white;
+    background: linear-gradient(135deg, rgba(37,99,235,0.8) 0%, rgba(79,70,229,0.8) 100%);
+    border-color: rgba(96,165,250,0.5);
+    box-shadow: 0 2px 12px rgba(37,99,235,0.35);
+  }
+
+  /* ── Chip preset buttons ────────────────────────────────── */
+  .chip {
+    @apply px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer select-none
+           transition-all duration-150 text-slate-400;
+    background: rgba(51,65,85,0.40);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .chip:hover  { @apply text-white; background: rgba(51,65,85,0.70); }
+  .chip.active {
+    @apply text-white;
+    background: rgba(37,99,235,0.5);
+    border-color: rgba(96,165,250,0.5);
+    box-shadow: 0 1px 8px rgba(37,99,235,0.3);
+  }
+
+  /* ── Range slider ───────────────────────────────────────── */
+  .slider {
+    @apply w-full h-2 rounded-full appearance-none cursor-pointer outline-none;
+  }
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 3px #2563eb, 0 2px 8px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+  .slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 4px #3b82f6, 0 4px 14px rgba(59,130,246,0.5);
+  }
+  .slider::-moz-range-thumb {
+    width: 20px; height: 20px; border: none; border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 3px #2563eb;
+    cursor: pointer;
+  }
+
+  /* ── Labels / Sections ──────────────────────────────────── */
+  .label   { @apply block text-xs font-bold uppercase tracking-widest text-slate-500 mb-2; }
+  .section-title { @apply text-xl font-bold text-white; }
+  .section-sub   { @apply text-sm text-slate-400 mt-0.5; }
+
+  /* ── Score ring colours ─────────────────────────────────── */
+  .score-excellent { color: #34d399; }
+  .score-good      { color: #60a5fa; }
+  .score-moderate  { color: #fbbf24; }
+  .score-poor      { color: #f87171; }
+
+  /* ── Toast ──────────────────────────────────────────────── */
+  .toast-success {
+    background: rgba(16,185,129,0.15);
+    border: 1px solid rgba(52,211,153,0.35);
+    @apply text-emerald-300;
+  }
+  .toast-error {
+    background: rgba(239,68,68,0.15);
+    border: 1px solid rgba(248,113,113,0.35);
+    @apply text-red-300;
+  }
+}
+
+/* ── Keyframes ──────────────────────────────────────────────── */
+@keyframes fadeIn  { from { opacity:0 } to { opacity:1 } }
+@keyframes slideUp { from { opacity:0; transform:translateY(14px) } to { opacity:1; transform:translateY(0) } }
+@keyframes popIn   { from { opacity:0; transform:scale(0.94) } to { opacity:1; transform:scale(1) } }
+
+.animate-fade-in  { animation: fadeIn  0.35s ease-out both; }
+.animate-slide-up { animation: slideUp 0.35s ease-out both; }
+.animate-pop-in   { animation: popIn   0.25s ease-out both; }
