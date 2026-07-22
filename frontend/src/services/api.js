@@ -38,4 +38,8 @@ export const getMealStats = (userId) => api.get(`/nutrition/meal-stats/${userId}
 export const fetchProfile = (userId) => api.get(`/profile/${userId}`);
 export const saveProfile  = (data)   => api.post("/profile", data);
 
+// ── Chat AI ─────────────────────────────────────────────────
+export const sendMessage      = (message, userId = 1) => api.post("/chat", { message, user_id: userId });
+export const fetchChatHistory = (userId = 1)          => api.get(`/chat/history?user_id=${userId}`);
+
 export default api;

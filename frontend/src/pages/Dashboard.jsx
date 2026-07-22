@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Home, Edit3, PieChart, FlaskConical, BarChart2, User as UserIcon, Activity } from "lucide-react";
+import { Home, Edit3, PieChart, FlaskConical, BarChart2, User as UserIcon, Activity, Bot } from "lucide-react";
 
 import HabitForm          from "../components/habitForm";
 import FutureSimulator    from "../components/futureSimulator";
@@ -9,7 +9,7 @@ import NutritionDashboard from "../components/NutritionDashboard";
 import GoalTracker        from "../components/GoalTracker";
 import WeightPrediction   from "../components/WeightPrediction";
 import TwinProfile        from "../components/twinProfile";
-
+import ChatPage           from "./ChatPage";
 import HeroSection      from "../components/HeroSection";
 import HealthScoreCard  from "../components/HealthScoreCard";
 import DigitalTwin      from "../components/DigitalTwin";
@@ -25,6 +25,7 @@ const TABS = [
   { id: "nutrition",  label: "Nutrition",  icon: <PieChart size={16} /> },
   { id: "simulate",   label: "Simulate",   icon: <FlaskConical size={16} /> },
   { id: "analytics",  label: "Analytics",  icon: <BarChart2 size={16} /> },
+  { id: "ai_bot",     label: "AI Assistant",icon: <Bot size={16} /> },
   { id: "profile",    label: "Profile",    icon: <UserIcon size={16} /> },
 ];
 
@@ -75,6 +76,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen pb-12 relative">
+      {activeTab === "ai_bot" && (
+        <ChatPage onBack={() => setActiveTab("overview")} />
+      )}
 
       {/* ── Top Nav ──────────────────────────────────────── */}
       <nav className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-xl border-b border-slate-700/50 shadow-md">

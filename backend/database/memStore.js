@@ -7,12 +7,14 @@
 let habitIdSeq = 1;
 let scoreIdSeq = 1;
 let foodIdSeq  = 1;
+let chatIdSeq  = 1;
 
 export const store = {
   profiles:     [],  // { user_id, height_cm, weight_kg, age, gender }
   habits:       [],  // { id, user_id, sleep_hours, water_intake, steps, meal_regularity, screen_time, exercise_minutes, created_at }
   healthScores: [],  // { id, user_id, habit_id, score, created_at }
   foodLogs:     [],  // { id, user_id, meal_type, food_name, quantity, calories, protein, created_at }
+  chatMessages: [],  // { id, user_id, role, message, created_at }
 };
 
 // Simulate async DB behaviour
@@ -27,6 +29,11 @@ export const db = {
     if (table === "health_scores") {
       const record = { ...row, id: scoreIdSeq++, created_at: now };
       store.healthScores.push(record);
+      return record;
+    }
+    if (table === "chat_messages") {
+      const record = { ...row, id: chatIdSeq++, created_at: now };
+      store.chatMessages.push(record);
       return record;
     }
   },
@@ -56,6 +63,12 @@ export const db = {
           const scoreRow = store.healthScores.find((s) => s.habit_id === h.id);
           return { ...h, score: scoreRow?.score ?? null };
         });
+    }
+    if (table === "chat_messages") {
+      return store.chatMessages
+        .filter((c) => c.user_id === userId)
+        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at)) // ASC for chat history
+        .slice(-(limit)); // Get last N messages
     }
     return [];
   },
